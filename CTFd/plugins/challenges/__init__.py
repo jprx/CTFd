@@ -66,6 +66,7 @@ class CTFdStandardChallenge(BaseChallenge):
             utils.upload_file(file=f, chalid=chal.id)
 
         db.session.commit()
+        return chal
 
     @staticmethod
     def read(challenge):

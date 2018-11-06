@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import re
@@ -391,11 +392,31 @@ def chal(chalid):
                     'message': "You have 0 tries remaining"
                 })
 
+            chal_name = chal.name
+            chal_value = chal.value
+            team_id = team.id
             status, message = chal_class.attempt(chal, request)
             if status:  # The challenge plugin says the input is right
                 if utils.ctftime() or utils.is_admin():
                     chal_class.solve(team=team, chal=chal, request=request)
                 logger.info("[{0}] {1} submitted {2} with kpm {3} [CORRECT]".format(*data))
+
+                team_url = url_for("views.team", teamid=team_id, _external=True)
+                chal_url = url_for("challenges.challenges_view", _anchor=chal_name, _external=True)
+                description = ":white_check_mark: [{0}]({1}) solved [{2}]({3}) ({4})".format(
+                    session['username'].encode('utf-8'),
+                    team_url,
+                    chal_name,
+                    chal_url,
+                    chal_value
+                )
+                embeds = [{
+                    "description": description,
+                    "color": 10553667,
+                    "timestamp": datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%SZ')
+                }]
+                utils.send_discord_webhook(embeds)
+
                 return jsonify({'status': 1, 'message': message})
             else:  # The challenge plugin says the input is wrong
                 if utils.ctftime() or utils.is_admin():

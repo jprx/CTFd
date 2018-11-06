@@ -6,6 +6,7 @@ from CTFd.plugins.challenges import get_chal_class, CHALLENGE_CLASSES
 
 from CTFd import utils
 
+import datetime
 import os
 
 admin_challenges = Blueprint('admin_challenges', __name__)
@@ -278,7 +279,24 @@ def admin_create_chal():
     if request.method == 'POST':
         chal_type = request.form['chaltype']
         chal_class = get_chal_class(chal_type)
-        chal_class.create(request)
+        chal = chal_class.create(request)
+
+        if not chal.hidden:
+            chal_url = url_for("challenges.challenges_view", _anchor=chal.name, _external=True)
+            description = ":new: [{0}]({1}) ({2}) has been created!".format(
+                chal.name,
+                chal_url,
+                chal.value,
+                chal.description
+            )
+            if chal.description:
+                description += "\n```{0}```".format(chal.description)
+            embeds = [{
+                "description": description,
+                "color": 10553667,
+                "timestamp": datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%SZ')
+            }]
+            utils.send_discord_webhook(embeds)
         return redirect(url_for('admin_challenges.admin_chals'))
     else:
         return render_template('admin/chals/create.html')
@@ -298,5 +316,23 @@ def admin_delete_chal():
 def admin_update_chal():
     challenge = Challenges.query.filter_by(id=request.form['id']).first_or_404()
     chal_class = get_chal_class(challenge.type)
+
+    old_description = challenge.description
+    challenge_name = challenge.name
     chal_class.update(challenge, request)
+    new_description = request.form["description"]
+    if old_description != new_description and not 'hidden' in request.form:
+        chal_url = url_for("challenges.challenges_view", _anchor=challenge_name, _external=True)
+        description = ":pencil: [{0}]({1}) has been updated!\n```{2}```".format(
+            challenge_name,
+            chal_url,
+            new_description or "No description"
+        )
+        embeds = [{
+            "description": description,
+            "color": 10553667,
+            "timestamp": datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%SZ')
+        }]
+        utils.send_discord_webhook(embeds)
+
     return redirect(url_for('admin_challenges.admin_chals'))

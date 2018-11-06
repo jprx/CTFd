@@ -146,6 +146,9 @@ class Config(object):
     '''
     UPDATE_CHECK = True
 
+    DISCORD_WEBHOOK_URL = None
+    DISCORD_AVATAR_URL = None
+
 
 class TestingConfig(Config):
     SECRET_KEY = 'AAAAAAAAAAAAAAAAAAAA'
@@ -157,3 +160,5 @@ class TestingConfig(Config):
     UPDATE_CHECK = False
     CACHE_REDIS_URL = None
     CACHE_TYPE = 'simple'
+    DISCORD_WEBHOOK_URL = None
+    DISCORD_AVATAR_URL = None
