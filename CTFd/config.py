@@ -238,6 +238,9 @@ class Config(object):
     UPDATE_CHECK = not os.getenv("UPDATE_CHECK")  # Defaults True
     APPLICATION_ROOT = os.getenv("APPLICATION_ROOT") or "/"
 
+    DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/509273046582951958/BXi4pa_nXcbpGTmISJH-otPW0_MRkFcgXtxD7gWYSAcCi22QDZV-Bv62uUN305OocINl"
+    DISCORD_AVATAR_URL = "http://ctf.sigpwny.com/themes/core/static/img/pwny-smol.png"
+
     """
     === OAUTH ===
 
@@ -260,3 +263,5 @@ class TestingConfig(Config):
     CACHE_TYPE = "simple"
     CACHE_THRESHOLD = 500
     SAFE_MODE = True
+    DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/509273046582951958/BXi4pa_nXcbpGTmISJH-otPW0_MRkFcgXtxD7gWYSAcCi22QDZV-Bv62uUN305OocINl"
+    DISCORD_AVATAR_URL = "http://ctf.sigpwny.com/themes/core/static/img/pwny-smol.png"

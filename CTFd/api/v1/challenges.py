@@ -12,6 +12,7 @@ from CTFd.models import (
     ChallengeFiles as ChallengeFilesModel,
 )
 from CTFd.plugins.challenges import CHALLENGE_CLASSES
+from CTFd.utils.webhooks import send_discord_webhook
 from CTFd.utils.dates import isoformat
 from CTFd.utils.decorators import (
     during_ctf_time_only,
@@ -43,6 +44,7 @@ from CTFd.utils.logging import log
 from CTFd.utils.security.signing import serialize
 from sqlalchemy.sql import and_
 import datetime
+from urllib import quote
 
 challenges_namespace = Namespace(
     "challenges", description="Endpoint to retrieve Challenges"
@@ -129,6 +131,7 @@ class ChallengeList(Resource):
 
     @admins_only
     def post(self):
+        # this is where challenges are initially submitted
         data = request.form or request.get_json()
         challenge_type = data["type"]
         challenge_class = get_chal_class(challenge_type)
@@ -282,10 +285,36 @@ class Challenge(Resource):
 
     @admins_only
     def patch(self, challenge_id):
+        # this is where challenges are updated
+        # they are hidden by default.
         challenge = Challenges.query.filter_by(id=challenge_id).first_or_404()
         challenge_class = get_chal_class(challenge.type)
         challenge = challenge_class.update(challenge, request)
         response = challenge_class.read(challenge)
+
+        # fire the discord webhook for create
+        if not challenge.state == "hidden":
+
+            # TODO you can do better if you figure out how flask does url_for
+            challenge_url = "http://ctf.sigpwny.com/challenges#" + quote(challenge.name)
+
+            description = ":new: [{0}]({1}) ({2}) has been created or updated!".format(
+                challenge.name,
+                challenge_url,
+                challenge.value,
+            )
+
+            if challenge.description:
+                description += "\n```{0}```".format(challenge.description)
+
+            embeds = [{
+                "description": description,
+                "color": 10553667,
+                "timestamp": datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%SZ')
+            }]
+
+            send_discord_webhook(embeds)
+
         return {"success": True, "data": response}
 
     @admins_only
@@ -424,9 +453,32 @@ class ChallengeAttempt(Resource):
             status, message = chal_class.attempt(challenge, request)
             if status:  # The challenge plugin says the input is right
                 if ctftime() or current_user.is_admin():
+                    # send discord webhook
+                    # @TODO replace static url with a global variable containing the site url in config.py
+                    user_url = "http://ctf.sigpwny.com/users/" + str(user.id)
+                    challenge_url = "http://ctf.sigpwny.com/challenges#" + quote(challenge.name)
+
+                    description = ":white_check_mark: [{0}]({1}) solved [{2}]({3}) ({4})".format(
+                        user.name,
+                        user_url,
+                        challenge.name,
+                        challenge_url,
+                        challenge.value
+                    )
+
+                    embeds = [{
+                        "description": description,
+                        "color": 10553667,
+                        "timestamp": datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%SZ')
+                    }]
+
+                    send_discord_webhook(embeds)
+
+                    # this kills the session
                     chal_class.solve(
                         user=user, team=team, challenge=challenge, request=request
                     )
+
                     clear_standings()
 
                 log(
