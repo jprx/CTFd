@@ -136,6 +136,29 @@ class ChallengeList(Resource):
         challenge_type = data["type"]
         challenge_class = get_chal_class(challenge_type)
         challenge = challenge_class.create(request)
+        print("challenge created")
+        # fire the discord webhook for create
+        # TODO you can do better if you figure out how flask does url_for
+        challenge_url = "http://ctf.sigpwny.com/challenges#" + quote(challenge.name)
+
+        description = ":new: [{0}]({1}) ({2}) has been created".format(
+            challenge.name,
+            challenge_url,
+            challenge.value,
+        )
+
+        if challenge.description:
+            description += "\n```{0}```".format(challenge.description)
+
+        embeds = [{
+            "description": description,
+            "color": 10553667,
+            "timestamp": datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%SZ')
+        }]
+
+        # TODO re enable after initial wave of challenges are uploaded
+        # send_discord_webhook(embeds)
+ 
         response = challenge_class.read(challenge)
         return {"success": True, "data": response}
 
@@ -298,7 +321,7 @@ class Challenge(Resource):
             # TODO you can do better if you figure out how flask does url_for
             challenge_url = "http://ctf.sigpwny.com/challenges#" + quote(challenge.name)
 
-            description = ":new: [{0}]({1}) ({2}) has been created or updated!".format(
+            description = ":pencil: [{0}]({1}) ({2}) has been updated!".format(
                 challenge.name,
                 challenge_url,
                 challenge.value,
