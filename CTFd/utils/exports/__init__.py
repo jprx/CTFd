@@ -47,8 +47,7 @@ class CTFdSerializer(JSONSerializer):
                     except ValueError:
                         pass
 
-            data = json.dumps(
-                result, cls=JSONEncoder, indent=self.export.get_int("indent")
+            data = json.dumps( result, cls=JSONEncoder, indent=self.export.get_int("indent")
             )
 
             callback = self.export.get("callback")
@@ -148,7 +147,8 @@ def import_ctf(backup, erase=True):
             side_db.query("SET session_replication_role=replica;")
         else:
             side_db.query("SET FOREIGN_KEY_CHECKS=0;")
-    except Exception:
+    except Exception as e:
+        print(e)        
         print("Failed to disable foreign key checks. Continuing.")
 
     first = [
