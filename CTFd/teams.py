@@ -75,6 +75,7 @@ def new():
     elif request.method == "POST":
         teamname = request.form.get("name")
         passphrase = request.form.get("password", "").strip()
+        teamtype = request.form.get("affiliation")
         errors = get_errors()
 
         user = get_current_user()
@@ -88,7 +89,7 @@ def new():
         if errors:
             return render_template("teams/new_team.html", errors=errors)
 
-        team = Teams(name=teamname, password=passphrase, captain_id=user.id)
+        team = Teams(name=teamname, password=passphrase, affiliation=teamtype, captain_id=user.id)
 
         db.session.add(team)
         db.session.commit()
