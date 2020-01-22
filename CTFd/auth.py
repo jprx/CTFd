@@ -159,9 +159,9 @@ def reset_password(data=None):
 def register():
     errors = get_errors()
     if request.method == "POST":
-        name = request.form["name"]
-        email_address = request.form["email"]
-        password = request.form["password"]
+        name = request.form["name"].strip()
+        email_address = request.form["email"].strip().lower()
+        password = request.form["password"].strip()
 
         name_len = len(name) == 0
         names = Users.query.add_columns("name", "id").filter_by(name=name).first()

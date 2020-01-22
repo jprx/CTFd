@@ -50,10 +50,9 @@ class UserSchema(ma.ModelSchema):
 
     @pre_load
     def validate_name(self, data):
-        name = data.get("name")
+        name = data.get("name").strip()
         if name is None:
             return
-        name = name.strip()
 
         existing_user = Users.query.filter_by(name=name).first()
         current_user = get_current_user()
@@ -91,10 +90,9 @@ class UserSchema(ma.ModelSchema):
 
     @pre_load
     def validate_email(self, data):
-        email = data.get("email")
+        email = data.get("email").strip()
         if email is None:
             return
-        email = email.strip()
 
         existing_user = Users.query.filter_by(email=email).first()
         current_user = get_current_user()
