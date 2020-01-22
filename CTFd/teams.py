@@ -73,7 +73,7 @@ def new():
     if request.method == "GET":
         return render_template("teams/new_team.html")
     elif request.method == "POST":
-        teamname = request.form.get("name")
+        teamname = request.form.get("name").strip()
         passphrase = request.form.get("password", "").strip()
         teamtype = request.form.get("affiliation")
         errors = get_errors()

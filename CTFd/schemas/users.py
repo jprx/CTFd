@@ -53,6 +53,7 @@ class UserSchema(ma.ModelSchema):
         name = data.get("name")
         if name is None:
             return
+        name = name.strip()
 
         existing_user = Users.query.filter_by(name=name).first()
         current_user = get_current_user()
@@ -93,6 +94,7 @@ class UserSchema(ma.ModelSchema):
         email = data.get("email")
         if email is None:
             return
+        email = email.strip()
 
         existing_user = Users.query.filter_by(email=email).first()
         current_user = get_current_user()
