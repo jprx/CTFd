@@ -30,8 +30,10 @@ services:
     image: nginx:1.17
     volumes:
       - ./conf/nginx/http.conf:/etc/nginx/nginx.conf
+      - ./sslkeys:/etc/ssl:ro
     ports:
       - 80:80
+      - 443:443
     depends_on:
       - ctfd
 
