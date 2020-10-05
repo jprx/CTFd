@@ -1,6 +1,6 @@
 {
   "name": "ctfd",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "CTFd is a Capture The Flag framework focusing on ease of use and customizability. It comes with everything you need to run a CTF and it's easy to customize with plugins and themes.",
   "main": "index.js",
   "directories": {
@@ -65,6 +65,6 @@
     "whatwg-fetch": "~3.0.0"
   },
   "dependencies": {
-    "@babel/polyfill": "~7.2.5"
+    "@babel/polyfill": "^7.11.5"
   }
 }
