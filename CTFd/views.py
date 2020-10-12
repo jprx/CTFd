@@ -436,3 +436,15 @@ def themes(theme, path):
         return send_file(filename)
     else:
         abort(404)
+
+
+@views.route("/.well-known/<path:path>")
+def well_known(path):
+    """
+    Return a well known path from the well-known directory
+    """
+    filename = safe_join(app.root_path, "well-known", path)
+    if os.path.isfile(filename):
+        return send_file(filename)
+    else:
+        abort(404)
