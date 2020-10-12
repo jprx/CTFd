@@ -442,6 +442,8 @@ def themes(theme, path):
 def well_known(path):
     """
     Return a well known path from the well-known directory
+    :param path:
+    :return:
     """
     filename = safe_join(app.root_path, "well-known", path)
     if os.path.isfile(filename):
